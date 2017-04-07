@@ -1,53 +1,50 @@
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 from quiz import managers
 from quiz.helpers import calculate_percent
+from quiz.mixins import ModelWithTextMixin
 
 
-class Question(models.Model):
-    text = models.CharField(
-        max_length=255,
-        verbose_name='Text',
-        null=True,
-        blank=True
-    )
-
-    def __str__(self):
-        return '{}?'.format(self.text)
+class Question(ModelWithTextMixin, models.Model):
+    pass
 
 
-class Answer(models.Model):
-    text = models.CharField(max_length=255, verbose_name='Text')
+class Answer(ModelWithTextMixin, models.Model):
     question = models.ForeignKey(Question, verbose_name='Question', null=True, blank=True)
-
-    def __str__(self):
-        return '{}? {}'.format(self.question.text, self.text)
 
 
 class Quiz(models.Model):
     objects = managers.QuizManager()
 
-    shared_link = models.URLField(verbose_name='Link for share')
+    def get_questions(self):
+        questions = self.selectedanswer_set.initials().values_list('question', flat=True)
+        if not questions.exists():
+            questions = Question.objects.all().order_by('?')[:settings.QUESTIONS_PER_QUIZ].values_list(
+                'id', flat=True
+            )
+        return questions
 
     def get_user_answers(self, user):
         return self.selectedanswer_set.filter(user=user)
 
     def get_initial_answers(self):
-        return dict(self.selectedanswer_set.initial().values_list('question', 'answer'))
+        return self.selectedanswer_set.initials().values('question', 'answer')
 
     def match_answers(self, user):
-        selected_answers = self.get_user_answers(user).values_list('question', 'answer')
+        selected_answers = self.get_user_answers(user).values('question', 'answer')
         initial_answers = self.get_initial_answers()
-        match = 0
-        total = len(selected_answers)
-        for question, answer in selected_answers:
-            if initial_answers[question] == answer:
-                match += 1
+        match = len(initial_answers.difference(selected_answers))
+        total = len(initial_answers)
         percent = calculate_percent(match, total)
-        return match, total, percent
+        return '{} of {} ({}%)'.format(match, total, percent)
+
+    def get_absolute_url(self):
+        return reverse('quiz-detail', kwargs={'pk': self.id})
 
 
 class SelectedAnswer(models.Model):
@@ -57,7 +54,4 @@ class SelectedAnswer(models.Model):
     user = models.ForeignKey(User)
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)
-    is_friend = models.BooleanField(default=True)
-
-    class Meta:
-        unique_together = ['quiz', 'user', 'question', 'answer']
+    is_friend = models.BooleanField(default=False)

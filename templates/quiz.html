@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+    <table class="table" style="width:100%">
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+        </tr>
+        {% for selectedanswer in selected_answers %}
+            <tr>
+                <td>{{ selectedanswer.question }}</td>
+                <td>{{ selectedanswer.answer }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% if mathed_answers %}
+        <h1>Match {{ mathed_answers }}</h1>
+    {% endif %}
+    <h1> Link for share {{ request.META.HTTP_REFERER }}</h1>
+{% endblock %}
+

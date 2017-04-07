@@ -24,7 +24,7 @@ SECRET_KEY = '8#fnvuo=jh$%66t!!esf!dct=4*k5e6&qs!1zdxahi+(sgjwoc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -35,10 +35,32 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'quiz.apps.QuizConfig',
-]
 
+    # Project Apps
+    'quiz.apps.QuizConfig',
+
+    # Libs
+    'social_django',
+    'django_extensions',
+    'bootstrap3',
+    'debug_toolbar',
+
+]
+# Social Auth settings
+# SOCIAL_AUTH_STORAGE = 'social_django_mongoengine.models.DjangoStorage'
+SOCIAL_AUTH_FACEBOOK_KEY = '411336915639389'
+SOCIAL_AUTH_FACEBOOK_SECRET = '14c9313f63b2c47e33882bed1fbf2a9a'
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+LOGIN_REDIRECT_URL = '/'
 MIDDLEWARE = [
+    # Libs
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    # standart
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -46,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'sweethearts_test.urls'
@@ -66,7 +89,7 @@ TEMPLATES = [
         },
     },
 ]
-
+INTERNAL_IPS = ('127.0.0.1',)
 WSGI_APPLICATION = 'sweethearts_test.wsgi.application'
 
 # Database
@@ -114,3 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Quiz settings
+
+QUESTIONS_PER_QUIZ = 10

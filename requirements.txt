@@ -1,0 +1,7 @@
+Django==1.11
+django-bootstrap3==8.2.2
+-e git+https://github.com/django-debug-toolbar/django-debug-toolbar.git@e5da8a4b8399c6d1b87fdc271bec929619b3ea33#egg=django_debug_toolbar
+django-extensions==1.7.8
+django-extra-views==0.9.0
+social-auth-app-django==1.1.0
+social-auth-core==1.2.0
