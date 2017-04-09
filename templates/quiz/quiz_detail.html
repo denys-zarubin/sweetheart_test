@@ -16,6 +16,6 @@
     {% if mathed_answers %}
         <h1>Match {{ mathed_answers }}</h1>
     {% endif %}
-    <h1> Link for share {{ request.META.HTTP_REFERER }}</h1>
+    <h1> Link for share {% url 'new-quiz' pk=object.id %}</h1>
 {% endblock %}
 

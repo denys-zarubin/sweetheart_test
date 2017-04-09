@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -11,7 +10,7 @@ from quiz.mixins import ModelWithTextMixin
 
 
 class Question(ModelWithTextMixin, models.Model):
-    pass
+    objects = managers.QuestionsManager()
 
 
 class Answer(ModelWithTextMixin, models.Model):
@@ -19,12 +18,14 @@ class Answer(ModelWithTextMixin, models.Model):
 
 
 class Quiz(models.Model):
-    objects = managers.QuizManager()
+    def __unicode__(self):
+        return "Game #".format(self.id)
 
     def get_questions(self):
         questions = self.selectedanswer_set.initials().values_list('question', flat=True)
         if not questions.exists():
-            questions = Question.objects.all().order_by('?')[:settings.QUESTIONS_PER_QUIZ].values_list(
+            # Generate random questions
+            questions = Question.objects.random_questions().values_list(
                 'id', flat=True
             )
         return questions
@@ -55,3 +56,6 @@ class SelectedAnswer(models.Model):
     question = models.ForeignKey(Question)
     answer = models.ForeignKey(Answer)
     is_friend = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return "{} {}".format(self.question.text, self.answer.text)

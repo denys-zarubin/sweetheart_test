@@ -12,5 +12,5 @@ class ModelWithTextMixin(models.Model):
         blank=True
     )
 
-    def __str__(self):
+    def __unicode__(self):
         return '{}'.format(self.text)
